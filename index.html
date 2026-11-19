@@ -65,12 +65,12 @@
     bottom: 0;
     height: 85vh;
     width: auto;
-    opacity: 0.16;
+    opacity: 0.14;
   }
   .forest-bg .tree-left { left: -40px; }
   .forest-bg .tree-right { right: -40px; transform: scaleX(-1); }
 
-  /* Layout utama (dioptimalkan untuk tampilan HP / Google Sites) */
+  /* Layout utama */
   .app-wrapper {
     position: relative;
     z-index: 1;
@@ -87,7 +87,7 @@
 
   /* Header & Bilah Kemajuan */
   .top-bar {
-    background: rgba(255, 255, 255, 0.94);
+    background: rgba(255, 255, 255, 0.96);
     border: 2px solid #E2E8F0;
     border-radius: var(--radius-lg);
     padding: 12px 16px;
@@ -197,17 +197,25 @@
   }
   .olie-avatar {
     flex-shrink: 0;
-    width: 58px;
-    height: 58px;
+    width: 60px;
+    height: 60px;
     background: var(--primary-light);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 2px solid var(--primary);
+    overflow: hidden;
+  }
+  .olie-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   .olie-speech {
     flex: 1;
+    min-width: 0;
   }
   .olie-name {
     font-size: 13px;
@@ -508,7 +516,7 @@
     gap: 8px;
   }
 
-  /* Layout Pengantar Identitas Baru dengan Olie */
+  /* Layout Pengantar Identitas dengan Olie */
   .identity-container {
     display: flex;
     flex-direction: column;
@@ -531,12 +539,31 @@
     padding: 16px;
     text-align: center;
     width: 100%;
-    max-width: 240px;
+    max-width: 220px;
     flex-shrink: 0;
+  }
+  .identity-visual-frame {
+    width: 104px;
+    height: 104px;
+    border-radius: 16px;
+    background: #FFFFFF;
+    border: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .identity-visual-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   .identity-form-side {
     flex: 1;
     width: 100%;
+    min-width: 0;
   }
 
   /* Tabel Responsif D2 */
@@ -645,7 +672,7 @@
     right: 12px;
     bottom: 12px;
     z-index: 50;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.94);
     color: #475569;
     border: 1px solid #CBD5E1;
     border-radius: 10px;
@@ -728,10 +755,6 @@
     100% { opacity: 1; transform: scale(1); }
   }
 
-  @keyframes fadeSlideUp {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -784,27 +807,23 @@
 
   <!-- Gelembung Bicara Olie -->
   <section class="olie-box" aria-live="polite">
-    <div id="olie-avatar" class="olie-avatar" aria-hidden="true">
-    <img src="Tuppy_dan_Apel_Emas-removebg-preview.png" alt="Olie Si Burung Hantu" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-    </div>
+    <div id="olie-avatar" class="olie-avatar" aria-hidden="true"></div>
     <div class="olie-speech">
       <div class="olie-name">Olie si Burung Hantu</div>
-      <p id="olie-message" class="olie-text">Halo detektif, kembali lagi bersama Olie!</p>
+      <p id="olie-message" class="olie-text">Halo detektif, kembali lagi bersama Olie! Yuk, tulis nama kamu dan kelasnya agar Olie bisa mengingatmu kembali nantinya.</p>
     </div>
   </section>
 
-  <!-- LAYAR 0: IDENTITAS DENGAN MASKOT OLIE DI SAMPING -->
+  <!-- LAYAR 0: IDENTITAS DENGAN MASKOT OLIE -->
   <main id="screen-identity" class="panel">
     <div class="identity-container">
       <div class="identity-olie-badge">
-        <!-- Ilustrasi Olie / Maskot -->
-          <img src="Tuppy_dan_Apel_Emas-removebg-preview.png" alt="Olie Si Burung Hantu" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-         </div>
+        <div id="identity-olie-frame" class="identity-visual-frame" aria-hidden="true"></div>
         <span style="font-weight: 900; font-size: 15px; color: var(--primary);">Olie siap mendampingi!</span>
       </div>
       <div class="identity-form-side">
         <p style="font-weight: 700; font-size: 17px; margin-bottom: 14px; line-height: 1.4;">
-          Yuk, tulis nama kamu dan kelasnya agar Olie bisa mengingatmu kembali nantinya.
+          Halo detektif, kembali lagi bersama Olie! Yuk, tulis nama kamu dan kelasnya agar Olie bisa mengingatmu kembali nantinya.
         </p>
         <form id="identity-form" novalidate>
           <div class="form-group">
@@ -1157,8 +1176,61 @@
 
 <script>
 const APPS_SCRIPT_URL = "ISI_ALAMAT_APPS_SCRIPT_DI_SINI";
+// Isi URL gambar Olie jika punya link publik; biarkan kosong ("") untuk memakai ilustrasi Olie bawaan.
+const OLIE_IMAGE_URL = "";
 
 (function() {
+  function createOlieVisual(sizeClass) {
+    if (OLIE_IMAGE_URL && OLIE_IMAGE_URL.trim() !== "") {
+      const img = document.createElement("img");
+      img.src = OLIE_IMAGE_URL.trim();
+      img.alt = "Olie si Burung Hantu";
+      img.addEventListener("error", () => {
+        img.replaceWith(buildFallbackSvg(sizeClass));
+      });
+      return img;
+    }
+    return buildFallbackSvg(sizeClass);
+  }
+
+  function buildFallbackSvg(sizeClass) {
+    const px = sizeClass === "large" ? 78 : 44;
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", String(px));
+    svg.setAttribute("height", String(px));
+    svg.setAttribute("viewBox", "0 0 64 64");
+    svg.setAttribute("fill", "none");
+    svg.style.display = "block";
+
+    svg.innerHTML = `
+      <circle cx="32" cy="34" r="22" fill="#7A2E78"/>
+      <path d="M16 18L22 26L14 28Z" fill="#5C205A"/>
+      <path d="M48 18L42 26L50 28Z" fill="#5C205A"/>
+      <circle cx="24" cy="31" r="7" fill="#FFFDF9"/>
+      <circle cx="40" cy="31" r="7" fill="#FFFDF9"/>
+      <circle cx="24" cy="31" r="3.5" fill="#1B2540"/>
+      <circle cx="40" cy="31" r="3.5" fill="#1B2540"/>
+      <polygon points="32,35 28,41 36,41" fill="#F59E0B"/>
+      <path d="M22 47Q32 53 42 47" stroke="#FFEFC2" stroke-width="3" stroke-linecap="round"/>
+    `;
+    return svg;
+  }
+
+  function renderOlieImages() {
+    const avatarBox = document.getElementById("olie-avatar");
+    const identityFrame = document.getElementById("identity-olie-frame");
+    if (avatarBox) {
+      avatarBox.innerHTML = "";
+      avatarBox.appendChild(createOlieVisual("small"));
+    }
+    if (identityFrame) {
+      identityFrame.innerHTML = "";
+      identityFrame.appendChild(createOlieVisual("large"));
+    }
+  }
+
+  renderOlieImages();
+
   const state = {
     nama: "",
     kelas: "",
